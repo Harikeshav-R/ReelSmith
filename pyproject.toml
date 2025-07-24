@@ -1,0 +1,6 @@
+[project]
+name = "ReelSmith"
+version = "0.1.0"
+description = "Fully automated generation of short-form videos"
+requires-python = ">=3.13"
+dependencies = []
