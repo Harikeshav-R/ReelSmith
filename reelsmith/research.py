@@ -46,7 +46,9 @@ class Research:
         tasks = [self._summarize(url) for url in urls]
         summaries = await asyncio.gather(*tasks)
 
-        return State(search_summary=summaries, **state.model_dump())
+        state.search_summary = summaries
+
+        return state
 
     def _search(self, topic: str, max_results: int = 5) -> list[str]:
         pass
