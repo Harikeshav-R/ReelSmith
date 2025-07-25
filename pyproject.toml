@@ -2,5 +2,25 @@
 name = "ReelSmith"
 version = "0.1.0"
 description = "Fully automated generation of short-form videos"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.27",
+    "langgraph>=0.5.4",
+    "moviepy>=2.2.1",
+    "typer>=0.16.0",
+]
+
+[project.optional-dependencies]
+local = [
+    "bs4>=0.0.2",
+    "whisperx>=3.4.2",
+    "soundfile>=0.13.1",
+    "ollama>=0.5.1",
+    "langchain-ollama>=0.3.6",
+    "kokoro>=0.9.4",
+]
+
+google = [
+    "langchain-google-genai>=2.1.8"
+]
