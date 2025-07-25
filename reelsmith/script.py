@@ -9,8 +9,7 @@ class ScriptGenerator:
         self.llm = llm
         self.instruction = instruction
 
-    @tool
-    async def generate(self, state: State) -> State:
+    def generate(self, state: State) -> State:
         """
         Generate a script from a given topic and research performed on that topic by surfing the web.
         """
