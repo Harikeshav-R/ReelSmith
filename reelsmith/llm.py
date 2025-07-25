@@ -26,6 +26,18 @@ class LLM:
 
         return self.llm.invoke(input=input, config=config, stop=stop, **kwargs)
 
+    async def ainvoke(self,
+                      input: PromptValue | str | Sequence[
+                          BaseMessage | list[str] | tuple[str, str] | str | dict[str, Any]],
+                      config: RunnableConfig | None = None,
+                      *,
+                      stop: list[str] | None = None,
+                      **kwargs: Any) -> BaseMessage:
+        if self.llm is None:
+            raise ValueError("LLM not initialized")
+
+        return await self.llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
+
 
 class OllamaLLM(LLM):
     def __init__(self, model: str, reasoning: bool = False):
