@@ -2,13 +2,12 @@ import asyncio
 import httpx
 
 from bs4 import BeautifulSoup
-from langchain_core.tools import tool
 
 from reelsmith.llm import LLM
 from reelsmith.stub import State
 
 
-class Search:
+class Research:
     def __init__(self, llm: LLM, instruction: str) -> None:
         self.llm = llm
         self.instruction = instruction
@@ -26,7 +25,7 @@ class Search:
         except httpx.HTTPStatusError:
             return ""
 
-    async def _summarize_helper(self, url: str):
+    async def _summarize(self, url: str):
         content = await self._extract_content(url)
 
         if not content:
@@ -41,25 +40,24 @@ class Search:
         except:
             return ""
 
-    @tool
-    async def summarize(self, state: State) -> State:
-        urls = self.search(state.topic)
+    async def research(self, state: State) -> State:
+        urls = self._search(state.topic)
 
-        tasks = [self._summarize_helper(url) for url in urls]
+        tasks = [self._summarize(url) for url in urls]
         summaries = await asyncio.gather(*tasks)
 
         return State(search_summary=summaries, **state.model_dump())
 
-    def search(self, topic: str, max_results: int = 5) -> list[str]:
+    def _search(self, topic: str, max_results: int = 5) -> list[str]:
         pass
 
 
-class SearXNGSearch(Search):
+class SearXNGResearch(Research):
     def __init__(self, llm: LLM, instruction: str, searxng_url="http://localhost:8888") -> None:
         super().__init__(llm, instruction)
         self.searxng_url = searxng_url
 
-    def search(self, topic: str, max_results: int = 5):
+    def _search(self, topic: str, max_results: int = 5):
         try:
             response = httpx.get(f"{self.searxng_url}/search", params={
                 "q": topic,
