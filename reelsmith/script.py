@@ -1,5 +1,3 @@
-from langchain_core.tools import tool
-
 from reelsmith.stub import State
 from reelsmith.llm import LLM
 
@@ -22,8 +20,6 @@ class ScriptGenerator:
         )
 
         response = self.llm.invoke(prompt)
+        state.script = response.content.strip()
 
-        return State(
-            script=response.content.strip(),
-            **state.model_dump()
-        )
+        return state
