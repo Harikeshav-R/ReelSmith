@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class ScriptState(BaseModel):
+class State(BaseModel):
     topic: str = Field(description="The topic for the video script.")
     search_summary: Optional[list[str]] = Field(
         description="The summary of the research performed by searching the web.")
