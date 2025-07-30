@@ -31,7 +31,7 @@ class Research:
         if not content:
             return ""
 
-        prompt = f"Summarize this article in 200 words:\n\n{content}"
+        prompt = f"Summarize this article in 500 words:\n\n{content}"
 
         try:
             result = await self.llm.ainvoke(prompt)
@@ -59,7 +59,7 @@ class SearXNGResearch(Research):
         super().__init__(llm, instruction)
         self.searxng_url = searxng_url
 
-    def _search(self, topic: str, max_results: int = 5):
+    def _search(self, topic: str, max_results: int = 3):
         try:
             response = httpx.get(f"{self.searxng_url}/search", params={
                 "q": topic,
