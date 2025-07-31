@@ -81,11 +81,6 @@ class TTSGenerator:
         final_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav", mode="wb")
 
         for sentence in sentences:
-            print(sentence)
-
-        input()
-
-        for sentence in sentences:
             audio_duration, audio_path = self._generate_audio(sentence)
             audio_durations.append(audio_duration)
             audio_files.append(audio_path)
