@@ -21,17 +21,19 @@ class LLM:
                config: RunnableConfig | None = None,
                *,
                stop: list[str] | None = None,
-               **kwargs: Any) -> BaseMessage:
+               **kwargs: Any) -> Any:
         if self.llm is None:
             raise ValueError("LLM not initialized")
 
         if output_structure is not None:
             llm = self.llm.with_structured_output(output_structure)
+            response = llm.invoke(input=input, config=config, stop=stop, **kwargs)
 
-        else:
-            llm = self.llm
+            if isinstance(response, dict):
+                return output_structure(**response)
+            return response
 
-        return llm.invoke(input=input, config=config, stop=stop, **kwargs)
+        return self.llm.invoke(input=input, config=config, stop=stop, **kwargs)
 
     async def ainvoke(self,
                       input: PromptValue | str | Sequence[
@@ -40,17 +42,20 @@ class LLM:
                       config: RunnableConfig | None = None,
                       *,
                       stop: list[str] | None = None,
-                      **kwargs: Any) -> BaseMessage:
+                      **kwargs: Any) -> Any:
         if self.llm is None:
             raise ValueError("LLM not initialized")
 
         if output_structure is not None:
             llm = self.llm.with_structured_output(output_structure)
+            response = await llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
 
-        else:
-            llm = self.llm
+            # Coerce to correct output type if needed
+            if isinstance(response, dict):
+                return output_structure(**response)
+            return response
 
-        return await llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
+        return await self.llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
 
 
 class OllamaLLM(LLM):
