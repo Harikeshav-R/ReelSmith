@@ -1,4 +1,5 @@
 import tempfile
+import threading
 import wave
 
 import ffmpeg
@@ -76,15 +77,24 @@ class TTSGenerator:
     def run_tts(self, state: State) -> State:
         sentences = self._generate_sentences(state)
 
-        audio_durations = []
-        audio_files = []
-        final_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav", mode="wb")
+        audio_durations = [None] * len(sentences)
+        audio_files = [None] * len(sentences)
 
-        for sentence in sentences:
+        def worker(index: int, sentence: str):
             audio_duration, audio_path = self._generate_audio(sentence)
-            audio_durations.append(audio_duration)
-            audio_files.append(audio_path)
+            audio_durations[index] = audio_duration
+            audio_files[index] = audio_path
 
+        threads = []
+        for idx, sentence in enumerate(sentences):
+            t = threading.Thread(target=worker, args=(idx, sentence))
+            t.start()
+            threads.append(t)
+
+        for t in threads:
+            t.join()
+
+        final_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav", mode="wb")
         self._concatenate_wav_files(audio_files,
                                     output_file=Path(final_audio_file.name))
 

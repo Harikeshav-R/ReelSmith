@@ -1,5 +1,8 @@
-import asyncio
+import threading
+
 import httpx
+
+from queue import Queue
 
 from bs4 import BeautifulSoup
 
@@ -13,41 +16,49 @@ class Research:
         self.instruction = instruction
 
     @staticmethod
-    async def _extract_content(url: str):
+    def _extract_content(url: str) -> str:
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, timeout=5)
-                response.raise_for_status()
+            response = httpx.get(url, timeout=5)
+            response.raise_for_status()
 
-                soup = BeautifulSoup(response.text, "html.parser")
-                return ' '.join(p.get_text() for p in soup.find_all("p")).strip().replace('\n', ' ')
+            soup = BeautifulSoup(response.text, "html.parser")
+            return ' '.join(p.get_text() for p in soup.find_all("p")).strip().replace('\n', ' ')
 
         except httpx.HTTPStatusError:
             return ""
 
-    async def _summarize(self, url: str):
-        content = await self._extract_content(url)
+    def _summarize(self, url: str, output_queue: Queue):
+        content = self._extract_content(url)
 
         if not content:
-            return ""
+            output_queue.put("")
+            return
 
         prompt = f"Summarize this article in 500 words:\n\n{content}"
 
         try:
-            result = await self.llm.ainvoke(prompt)
-            return result.content.strip()
+            result = self.llm.invoke(prompt)
+            output_queue.put(result.content.strip())
 
-        except:
-            return ""
+        except Exception:
+            output_queue.put("")
 
-    async def research(self, state: State) -> State:
+    def research(self, state: State) -> State:
         urls = self._search(state.topic)
+        output_queue = Queue()
+        threads = []
 
-        tasks = [self._summarize(url) for url in urls]
-        summaries = await asyncio.gather(*tasks)
+        for url in urls:
+            thread = threading.Thread(target=self._summarize, args=(url, output_queue))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+
+        summaries = [output_queue.get() for _ in urls]
 
         state.search_summary = summaries
-
         return state
 
     def _search(self, topic: str, max_results: int = 5) -> list[str]:
