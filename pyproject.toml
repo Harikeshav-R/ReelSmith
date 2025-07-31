@@ -5,6 +5,7 @@ description = "Fully automated generation of short-form videos"
 requires-python = ">=3.12"
 dependencies = [
     "bs4>=0.0.2",
+    "ffmpeg-python>=0.2.0",
     "httpx>=0.28.1",
     "kokoro>=0.9.4",
     "langchain>=0.3.27",
