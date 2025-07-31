@@ -1,4 +1,4 @@
-from reelsmith.stub import State, ImagePromptSegment, ScriptWords, ImageSegmentList
+from reelsmith.stub import State, ImagePromptSegment, Script, ImageSegmentList
 from reelsmith.llm import LLM
 
 
@@ -14,6 +14,7 @@ You will be given a script topic, and research performed on that topic by surfin
 of 12–15 sentences that explains or tells a story about the topic in clear and natural language.
 
 Return the script as a JSON object with:
+- script_plaintext: The full script in one string in plain text.
 - script_words: a list of strings, where each item is a word or punctuation mark (e.g., ".", ",") in the order they appear 
 in the script.
 
@@ -28,8 +29,8 @@ Topic: {topic}
 Research: {research}
         """
 
-        state.script_words = self.llm.invoke(prompt.format(topic=state.topic, research=state.search_summary),
-                                             output_structure=ScriptWords)
+        state.script = self.llm.invoke(prompt.format(topic=state.topic, research=state.search_summary),
+                                       output_structure=Script)
 
         return state
 
@@ -69,8 +70,8 @@ Here are the script_words to process:
         """
 
         state.image_segments = self.llm.invoke(
-            prompt.format(length=len(state.script_words.script_words), script_words=state.script_words.script_words,
-                          last_index=len(state.script_words.script_words) - 1),
+            prompt.format(length=len(state.script.script_words), script_words=state.script.script_words,
+                          last_index=len(state.script.script_words) - 1),
             output_structure=ImageSegmentList)
 
         return state

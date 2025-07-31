@@ -14,7 +14,8 @@ class ImageSegmentList(BaseModel):
     image_segments: list[ImagePromptSegment]
 
 
-class ScriptWords(BaseModel):
+class Script(BaseModel):
+    script_plaintext: str
     script_words: list[str]
 
 
@@ -22,7 +23,7 @@ class State(BaseModel):
     topic: str = Field(description="The topic for the video script.")
     search_summary: Optional[list[str]] = Field(
         description="The summary of the research performed by searching the web.", default=None)
-    script_words: Optional[ScriptWords] = Field(description="The script split into a list of words", default=None)
+    script: Optional[Script] = Field(description="The video script in plain text and word split form.", default=None)
     image_segments: Optional[ImageSegmentList] = Field(description="The image prompts for each range of words",
                                                        default=None)
     audio_path: Optional[Path] = Field(description="The path to the generated audio.", default=None)
