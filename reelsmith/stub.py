@@ -26,6 +26,8 @@ class State(BaseModel):
     script: Optional[Script] = Field(description="The video script in plain text and word split form.", default=None)
     image_segments: Optional[ImageSegmentList] = Field(description="The image prompts for each range of words",
                                                        default=None)
-    audio_path: Optional[Path] = Field(description="The path to the generated audio.", default=None)
+    final_audio_path: Optional[Path] = Field(description="The path to the generated audio.", default=None)
+    audio_clip_durations: Optional[list[float]] = Field(description="The durations of the generated audio segments.",
+                                                        default=None)
     caption_path: Optional[Path] = Field(description="The path to the generated captions.", default=None)
     video_path: Optional[Path] = Field(description="The path to the final generated video.", default=None)
