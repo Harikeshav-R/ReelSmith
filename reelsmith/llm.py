@@ -17,6 +17,7 @@ class LLM:
 
     def invoke(self,
                input: PromptValue | str | Sequence[BaseMessage | list[str] | tuple[str, str] | str | dict[str, Any]],
+               output_structure: Any = None,
                config: RunnableConfig | None = None,
                *,
                stop: list[str] | None = None,
@@ -24,11 +25,18 @@ class LLM:
         if self.llm is None:
             raise ValueError("LLM not initialized")
 
-        return self.llm.invoke(input=input, config=config, stop=stop, **kwargs)
+        if output_structure is not None:
+            llm = self.llm.with_structured_output(output_structure)
+
+        else:
+            llm = self.llm
+
+        return llm.invoke(input=input, config=config, stop=stop, **kwargs)
 
     async def ainvoke(self,
                       input: PromptValue | str | Sequence[
                           BaseMessage | list[str] | tuple[str, str] | str | dict[str, Any]],
+                      output_structure: Any = None,
                       config: RunnableConfig | None = None,
                       *,
                       stop: list[str] | None = None,
@@ -36,16 +44,22 @@ class LLM:
         if self.llm is None:
             raise ValueError("LLM not initialized")
 
-        return await self.llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
+        if output_structure is not None:
+            llm = self.llm.with_structured_output(output_structure)
+
+        else:
+            llm = self.llm
+
+        return await llm.ainvoke(input=input, config=config, stop=stop, **kwargs)
 
 
 class OllamaLLM(LLM):
-    def __init__(self, model: str, reasoning: bool = False):
+    def __init__(self, model: str, reasoning: bool = False) -> None:
         super().__init__(model, reasoning)
         self.llm = ChatOllama(model=model, reasoning=reasoning)
 
 
 class GoogleLLM(LLM):
-    def __init__(self, model: str, reasoning: bool = False):
+    def __init__(self, model: str, reasoning: bool = False) -> None:
         super().__init__(model, reasoning)
         self.llm = ChatGoogleGenerativeAI(model=model)
