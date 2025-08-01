@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class ImagePromptSegment(BaseModel):
     prompt: str = Field(..., description="A prompt to generate an image relevant to a section of the script.")
-    word_range: Tuple[int, int] = Field(...,
+    word_range: list[int] = Field(...,
                                         description="A tuple (start_index, end_index) indicating the range of word indices the image relates to.")
 
 
